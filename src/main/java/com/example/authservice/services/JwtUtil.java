@@ -1,6 +1,6 @@
 package com.example.authservice.services;
 
-import com.example.authservice.entities.UserDto;
+import com.example.authservice.dto.UserDto;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -33,6 +33,12 @@ public class JwtUtil {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
     }
 
+    public String generate(UserDto userDto, String type) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", userDto.getId());
+        claims.put("role", userDto.getRole());
+        return doGenerateToken(claims, userDto.getEmail(), type);
+    }
 
     public Date getExpirationDateFromToken(String token) {
         return getAllClaimsFromToken(token).getExpiration();
@@ -41,13 +47,6 @@ public class JwtUtil {
     private Boolean isTokenExpired(String token) {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
-    }
-
-    public String generate(UserDto userDto, String type) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("id", userDto.getId());
-        claims.put("role", userDto.getRole());
-        return doGenerateToken(claims, userDto.getEmail(), type);
     }
 
     private String doGenerateToken(Map<String, Object> claims, String username, String type) {

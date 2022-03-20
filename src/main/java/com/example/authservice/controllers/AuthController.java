@@ -1,36 +1,41 @@
 package com.example.authservice.controllers;
 
 
-import com.example.authservice.entities.AuthRequest;
-import com.example.authservice.entities.AuthResponse;
-import com.example.authservice.entities.UserDto;
+import com.example.authservice.dto.AuthRequest;
+import com.example.authservice.dto.AuthResponse;
+import com.example.authservice.entity.User;
+import com.example.authservice.exception.IncorrectCredentialsException;
+import com.example.authservice.exception.IncorrectEmailException;
+import com.example.authservice.exception.UserAlreadyExistException;
+import com.example.authservice.exception.UserNotFound;
 import com.example.authservice.services.AuthService;
-import com.example.authservice.services.JwtUtil;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/auth")
 @AllArgsConstructor
+@CrossOrigin
 public class AuthController {
 
     private final AuthService authService;
-    private final JwtUtil jwtUtil;
+
+    @PostMapping("/get-current-user")
+    public User getCurrentUser(@RequestBody String token) throws UserNotFound {
+
+        //TODO: rewrite with dto
+        return authService.getCurrentUser(token);
+    }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody String userName) {
-        String token = jwtUtil.generate(new UserDto(), "ACCESS");;
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) throws UserNotFound, IncorrectCredentialsException {
 
-        return new ResponseEntity<String>(token, HttpStatus.OK);
+        return authService.login(request);
     }
 
     @PostMapping(value = "/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody AuthRequest authRequest) {
+    public ResponseEntity<AuthResponse> register(@RequestBody AuthRequest authRequest) throws IncorrectEmailException, UserAlreadyExistException {
         return ResponseEntity.ok(authService.register(authRequest));
     }
 

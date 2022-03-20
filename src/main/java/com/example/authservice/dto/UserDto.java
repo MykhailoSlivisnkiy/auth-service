@@ -1,4 +1,4 @@
-package com.example.authservice.entities;
+package com.example.authservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,8 +10,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @Data
 public class UserDto {
-    private String id;
+    private Long id;
     private String email;
     private String password;
+    private String name;
     private String role;
 }
