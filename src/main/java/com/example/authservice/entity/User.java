@@ -41,6 +41,13 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "shop_id"))
     List<Shop> subscribedShops;
 
+    @ManyToMany
+    @JoinTable(
+            name = "favorite_user_shop",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "shop_id"))
+    List<Shop> favoriteShops;
+
     public User(String name, String email, String password) {
         this.name = name;
         this.email = email;
