@@ -3,6 +3,7 @@ package com.example.authservice.controllers;
 
 import com.example.authservice.dto.AuthRequest;
 import com.example.authservice.dto.AuthResponse;
+import com.example.authservice.dto.SignUpRequest;
 import com.example.authservice.entity.User;
 import com.example.authservice.exception.IncorrectCredentialsException;
 import com.example.authservice.exception.IncorrectEmailException;
@@ -35,8 +36,8 @@ public class AuthController {
     }
 
     @PostMapping(value = "/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody AuthRequest authRequest) throws IncorrectEmailException, UserAlreadyExistException {
-        return ResponseEntity.ok(authService.register(authRequest));
+    public ResponseEntity<AuthResponse> register(@RequestBody SignUpRequest signUpRequest) throws IncorrectEmailException, UserAlreadyExistException {
+        return ResponseEntity.ok(authService.register(signUpRequest));
     }
 
 }

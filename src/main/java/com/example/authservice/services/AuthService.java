@@ -4,13 +4,13 @@ package com.example.authservice.services;
 import com.example.authservice.constant.ErrorMessage;
 import com.example.authservice.dto.AuthRequest;
 import com.example.authservice.dto.AuthResponse;
+import com.example.authservice.dto.SignUpRequest;
 import com.example.authservice.dto.UserDto;
 import com.example.authservice.entity.User;
 import com.example.authservice.exception.IncorrectCredentialsException;
 import com.example.authservice.exception.IncorrectEmailException;
 import com.example.authservice.exception.UserAlreadyExistException;
 import com.example.authservice.exception.UserNotFound;
-import io.jsonwebtoken.Claims;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.Base64;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,20 +48,20 @@ public class AuthService {
         return new ResponseEntity<AuthResponse>(new AuthResponse(token, refreshToken), HttpStatus.OK);
     }
 
-    public AuthResponse register(AuthRequest authRequest) throws IncorrectEmailException, UserAlreadyExistException {
+    public AuthResponse register(SignUpRequest authRequest) throws IncorrectEmailException, UserAlreadyExistException {
         //do validation if user already exists
 
-        if(validate(authRequest.getLogin())) {
+        if(!isEmailvalidated(authRequest.getEmail())) {
             throw new IncorrectEmailException(ErrorMessage.USER_EMAIL_IS_INCORRECT);
         }
 
-        if(userService.isUserExist(authRequest.getLogin())) {
-            throw new UserAlreadyExistException(String.format(ErrorMessage.USER_ALREADY_EXIST, authRequest.getLogin()));
+        if(userService.isUserExist(authRequest.getEmail())) {
+            throw new UserAlreadyExistException(String.format(ErrorMessage.USER_ALREADY_EXIST, authRequest.getEmail()));
         }
 
         authRequest.setPassword(new BCryptPasswordEncoder().encode(authRequest.getPassword()));
 
-        User user = new User("test", authRequest.getLogin(), authRequest.getPassword());
+        User user = new User(authRequest.getName(), authRequest.getEmail(), authRequest.getPassword());
 
         user = userService.save(user);
 
@@ -74,7 +74,7 @@ public class AuthService {
         return new AuthResponse(accessToken, refreshToken);
     }
 
-    private static boolean validate(String emailStr) {
+    private static boolean isEmailvalidated(String emailStr) {
         Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(emailStr);
         return matcher.find();
     }
